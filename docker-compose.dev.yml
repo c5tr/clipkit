@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  clipkit-db:
+    container_name: clipkit-db
+    image: postgres:15
+    volumes:
+      - clipkit_db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    env_file:
+      - ./.env
+volumes:
+  clipkit_db:

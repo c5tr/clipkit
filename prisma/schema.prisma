@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String  @id @default(uuid())
+  username String  @unique
+  password String
+  secret   String
+  isAdmin  Boolean @default(false)
+}
+
+model Clip {
+  id           String   @id @default(uuid())
+  slug         String   @unique @default(uuid())
+  title        String
+  userId       String
+  url          String?
+  thumbnailUrl String?
+  private      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
+}
