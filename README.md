@@ -1,6 +1,6 @@
 # clipkit
 
-this is a webapp to upload and host video files, with a focus on Discord embedding. It's still a work in progress.
+this is a webapp to upload and host video files, with a focus on Discord embedding. it's a paused work in progress. it was created to learn about the Remix framework and authentication.
 
 ## roadmap
 
