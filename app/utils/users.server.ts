@@ -4,6 +4,10 @@ import * as bcrypt from "bcrypt";
 import { prisma } from "./db.server";
 import { generateJwtSecret } from "./sessions.server";
 
+export async function countUsers() {
+  return await prisma.user.count();
+}
+
 export async function createUser(user: z.infer<typeof UserType>) {
   return await prisma.user.create({
     data: {
@@ -14,20 +18,40 @@ export async function createUser(user: z.infer<typeof UserType>) {
   });
 }
 
-export async function getUserById(id: string, redacted?: boolean) {
+export async function getAllUsers() {
+  return await prisma.user.findMany({
+    select: {
+      id: true,
+      username: true,
+      isAdmin: true
+    }
+  })
+}
+
+export async function getUserById(id: string, redacted?: boolean, includeClips?: boolean) {
   return await prisma.user.findUnique({
     where: {
       id,
     },
-    select: redacted ? { username: true } : null,
+    select: {
+      id: true,
+      isAdmin: true,
+      username: true,
+      clips: includeClips,
+      password: !redacted,
+      secret: !redacted
+    }
   });
 }
 
-export async function getUserByUsername(username: string) {
+export async function getUserByUsername(username: string, includeClips?: boolean) {
   return await prisma.user.findUnique({
     where: {
       username,
     },
+    include: {
+      clips: includeClips
+    }
   });
 }
 

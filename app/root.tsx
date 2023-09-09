@@ -10,7 +10,7 @@ import {
   useLoaderData,
 } from "@remix-run/react";
 import stylesheet from "~/styles.css";
-import { getUser } from "./utils/sessions.server";
+import { decodeJwtFromRequest } from "./utils/sessions.server";
 import { Header } from "./components/header";
 
 export const links: LinksFunction = () => [
@@ -19,7 +19,7 @@ export const links: LinksFunction = () => [
 ];
 
 export async function loader({ request }: LoaderArgs) {
-  return await getUser(request);
+  return await decodeJwtFromRequest(request) ?? null;
 }
 
 export const meta: V2_MetaFunction = () => {

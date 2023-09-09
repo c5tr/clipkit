@@ -9,7 +9,7 @@ export async function action({ request, params }: ActionArgs) {
     return json({ error: "An ID is required" }, { status: 400 });
   }
   const clip = await getClipById(id);
-  if (user.id != clip?.userId) {
+  if (user.id != clip?.userId && !user.isAdmin) {
     return json({ error: "This clip belongs to another user" }, { status: 401 });
   }
   await deleteClip(id);

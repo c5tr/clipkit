@@ -22,7 +22,7 @@ export default function Settings() {
         <Divider />
       </div>
       <div className="grid gap-16 sm:grid-cols-2">
-        <Form className="flex flex-col gap-2" method="post" action="/app/api/user/update?redirect">
+        <Form className="flex flex-col gap-2" method="post" action="/api/user/update?redirect">
           <h2>User settings</h2>
           <p>Username</p>
           <TextInput name="username" placeholder={data.username} />
@@ -31,7 +31,7 @@ export default function Settings() {
         <div className="block sm:hidden">
           <Divider />
         </div>
-        <Form className="flex flex-col gap-2" action="/app/api/user/password?redirect">
+        <Form className="flex flex-col gap-2" action="/api/user/password?redirect">
           <h2>Password</h2>
           <p>Old password</p>
           <TextInput type="password" name="oldPassword" placeholder="Old password" />
@@ -41,15 +41,6 @@ export default function Settings() {
           <TextInput type="password" name="confirmNewPassword" placeholder="New password" />
           <Button>Save</Button>
         </Form>
-        <div className="block sm:hidden">
-          <Divider />
-        </div>
-        <div className="flex flex-col gap-2">
-          <h2>Sessions</h2>
-          <Button type="submit" destructive>
-            Log out everywhere
-          </Button>
-        </div>
         <div className="block sm:hidden">
           <Divider />
         </div>

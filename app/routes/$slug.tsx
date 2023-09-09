@@ -43,7 +43,7 @@ export default function ClipDisplay() {
 
   return (
     <div className="flex flex-col gap-2">
-      <video src={data.url!} controls />
+      <video src={data.url!} controls className="aspect-video" poster={data.thumbnailUrl!} />
       <p className="text-xl font-bold">{data.title!}</p>
     </div>
   );

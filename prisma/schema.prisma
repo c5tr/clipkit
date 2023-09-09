@@ -13,12 +13,14 @@ model User {
   password String
   secret   String
   isAdmin  Boolean @default(false)
+  clips    Clip[]
 }
 
 model Clip {
   id           String   @id @default(uuid())
   slug         String   @unique @default(uuid())
   title        String
+  user         User     @relation(fields: [userId], references: [id])
   userId       String
   url          String?
   thumbnailUrl String?

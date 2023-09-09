@@ -12,7 +12,7 @@ export function ClipPreviewButton({
   onClick?: () => void;
 }) {
   const baseClasses =
-    "flex cursor-pointer items-center justify-center hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900";
+    "flex cursor-pointer items-center justify-center hover:bg-zinc-100 border-default dark:hover:bg-zinc-900";
   const borderClasses = {
     left: "border-l",
     right: "border-r",

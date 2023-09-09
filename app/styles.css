@@ -15,3 +15,7 @@ h1 {
 h2 {
     @apply font-bold;
 }
+
+.border-default {
+    @apply border-zinc-600 dark:border-zinc-700;
+}

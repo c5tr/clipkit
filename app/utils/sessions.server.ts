@@ -18,36 +18,53 @@ export async function generateJwtSecret() {
   return crypto.randomBytes(32).toString("hex");
 }
 
-export async function decodeJwtFromRequest(request: Request) {
+/**
+ * Extract the user's ID and username from a JWT included with the request.
+ * 
+ * @param request HTTP Request
+ * @param returnToken Include JWT in return object
+ * @returns User's ID and username
+ */
+export async function decodeJwtFromRequest(request: Request, returnToken?: boolean) {
   const cookieHeader = request.headers.get("Cookie");
   const token: string | undefined = await tokenCookie.parse(cookieHeader);
-  if (!token) return null;
+  if (!token) return undefined;
 
   const jwtData = jwt.decode(token, { json: true });
   if (!jwtData) return undefined;
-  return { id: jwtData["userId"], username: jwtData["username"] };
+  return { id: jwtData["id"] as string, username: jwtData["username"] as string, token: returnToken ? token : undefined };
 }
 
+/**
+ * Helper to identify a user based on the token included with the request.
+ * To protect a route, use `requireUser()` instead.
+ * 
+ * @param request HTTP Request
+ * @returns User
+ */
 export async function getUser(request: Request) {
   try {
-    const cookieHeader = request.headers.get("Cookie");
-    const token: string | undefined = await tokenCookie.parse(cookieHeader);
-    if (!token) return null;
+    const jwtUser = await decodeJwtFromRequest(request, true);
+    if (!jwtUser) return null;
 
-    const jwtData = jwt.decode(token, { json: true });
-    if (!jwtData) return null;
-    const userId: string = jwtData["userId"];
-
-    const user = await getUserById(userId);
+    const user = await getUserById(jwtUser.id);
     if (!user) return null;
 
-    jwt.verify(token, user.secret);
-    return { id: user.id, username: user.username };
+    jwt.verify(jwtUser.token!, user.secret);
+    return user;
   } catch (e) {
     return null;
   }
 }
 
+/**
+ * Helper to protect a route. It has to be used in a route that requires the user
+ * to be logged in.
+ * 
+ * @param request HTTP Request
+ * @param redirectTo URL to redirect to after a successful login
+ * @returns User
+ */
 export async function requireUser(
   request: Request,
   redirectTo: string = new URL(request.url).pathname,
@@ -61,8 +78,25 @@ export async function requireUser(
   return user;
 }
 
+/**
+ * 
+ * @param request HTTP Request
+ * @returns 
+ */
+export async function requireAdmin(
+  request: Request,
+  redirectTo: string = new URL(request.url).pathname,
+) {
+  const user = await requireUser(request);
+  if (!user.isAdmin) {
+    const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
+    throw redirect(`/login?${searchParams}`);
+  }
+  return user;
+}
+
 export async function createUserSession(userId: string, username: string, secret: string, redirectTo: string) {
-  const token = jwt.sign({ userId }, secret);
+  const token = jwt.sign({ id: userId, username }, secret);
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await tokenCookie.serialize(token),
@@ -71,7 +105,7 @@ export async function createUserSession(userId: string, username: string, secret
 }
 
 export async function logout(request: Request) {
-  return redirect("/", {
+  throw redirect("/", {
     headers: {
       "Set-Cookie": "token=\"\"; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
     }

@@ -26,7 +26,7 @@ export default function App() {
   async function startUpload() {
     const startUploadFormData = new FormData();
     startUploadFormData.append("filename", inputRef.current!.files![0].name);
-    const shouldStartUpload = await fetch("/app/api/start-upload", {
+    const shouldStartUpload = await fetch("/api/clip/upload/prepare", {
       method: "post",
       body: startUploadFormData,
     });
@@ -41,7 +41,7 @@ export default function App() {
     const uploadMetadata: Clip = await shouldStartUpload.json();
     const fileFormData = new FormData();
     fileFormData.append("file", inputRef.current!.files![0]);
-    const fileUpload = await fetch("/app/api/upload/" + uploadMetadata.id, {
+    const fileUpload = await fetch("/api/clip/upload/file/" + uploadMetadata.id, {
       method: "post",
       body: fileFormData,
     });
@@ -54,7 +54,7 @@ export default function App() {
   }
 
   async function deleteClip(id: string) {
-    const deleteReq = await fetch("/app/api/delete/" + id, {
+    const deleteReq = await fetch("/api/clip/delete/" + id, {
       method: "post",
     });
     if (!deleteReq.ok) {
@@ -74,7 +74,7 @@ export default function App() {
         onChange={startUpload}
       />
       <div
-        className="flex w-full cursor-pointer justify-center rounded-lg border px-4 py-2 hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+        className="flex w-full cursor-pointer justify-center rounded-lg border border-default px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-900"
         onClick={openUploadDialog}
       >
         Upload
@@ -86,14 +86,14 @@ export default function App() {
               <img
                 src={clip.thumbnailUrl}
                 alt={`Thumbnail of ${clip.title}`}
-                className="aspect-video rounded-lg object-cover"
+                className="aspect-video rounded-lg object-cover border border-default"
               />
             )}
             {!clip.thumbnailUrl && <LoadingThumbnail />}
             <p className="line-clamp-1 overflow-ellipsis">{clip.title}</p>
-            <div className="flex w-full flex-row overflow-hidden rounded-lg border text-zinc-600 dark:border-zinc-700 dark:text-zinc-300 [&>*]:flex-grow [&>*]:py-2">
+            <div className="flex w-full flex-row overflow-hidden rounded-lg border border-default text-zinc-600 dark:text-zinc-300 [&>*]:flex-grow [&>*]:py-2">
               {clip.url && (
-                <ClipPreviewButton border="left" href={clip.url} icon="icon-[bi--play-fill]" />
+                <ClipPreviewButton border="right" href={"/" + clip.slug} icon="icon-[bi--play-fill]" />
               )}
               <ClipPreviewButton border="none" onClick={() => {}} icon="icon-[bi--pencil-square]" />
               {clip.url && (

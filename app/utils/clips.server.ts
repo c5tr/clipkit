@@ -1,6 +1,34 @@
 import { prisma } from "./db.server";
 import * as fs from "fs/promises";
 
+/**
+ * Count all the clips stored in the server. 
+ * 
+ * @param id Optional user ID to count all the clips coming from an user
+ */
+export async function countClips(id?: string) {
+  return await prisma.clip.count({
+    where: {
+      userId: id
+    }
+  })
+}
+
+export async function getAllClips() {
+  return await prisma.clip.findMany({
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      userId: true,
+      createdAt: true
+    },
+    orderBy: {
+      createdAt: "desc"
+    }
+  });
+}
+
 export async function getClipsByUserId(id: string) {
   return await prisma.clip.findMany({
     where: {
