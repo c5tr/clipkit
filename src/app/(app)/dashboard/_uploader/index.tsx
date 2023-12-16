@@ -3,14 +3,29 @@
 import { useRef, useState } from "react";
 import { Button } from "~/components/button";
 import { Spinner } from "~/components/spinner";
+import { createUpload, finishUpload } from "./actions";
 
 export function Uploader() {
   const [uploadsInProgress, setUploadsInProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  function onFilesSelected() {
+  async function onFilesSelected() {
     if (fileInputRef.current!.files!.length == 0) return;
     setUploadsInProgress((v) => v + fileInputRef.current!.files!.length);
+    for (let i = 0; i < fileInputRef.current!.files!.length; i++) {
+      const uploadInfo = await createUpload(fileInputRef.current!.files![i].name);
+      console.log(uploadInfo);
+      const uploadReq = await fetch(uploadInfo.uploadUrl, {
+        method: 'PUT',
+        body: fileInputRef.current!.files![i]
+      });
+      if (uploadReq.ok) {
+        // finish upload
+        await finishUpload(uploadInfo.id);
+      }
+      // show errors
+      setUploadsInProgress(v => v - 1);
+    }
   }
 
   return (
@@ -25,14 +40,14 @@ export function Uploader() {
       />
       <Button
         className={`w-full bg-zinc-100 dark:bg-zinc-900 ${
-          uploadsInProgress > 0 ? "rounded-b-none" : ""
+          uploadsInProgress > 0 ? "hidden" : ""
         }`}
         onClick={() => fileInputRef.current?.click()}
       >
         Upload
       </Button>
       {uploadsInProgress > 0 && (
-        <div className="flex items-center justify-center gap-4 rounded-b-lg bg-black/10 px-4 py-2 dark:bg-white/10">
+        <div className="flex items-center justify-center gap-4 rounded-lg bg-black/10 px-4 py-2 dark:bg-white/10">
           <Spinner />
           <span>
             Uploading {uploadsInProgress}{" "}
