@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    @apply border-black/20 bg-black/10 px-4 py-2 dark:border-black/20 dark:bg-white/10 rounded-lg;
+  }
+}

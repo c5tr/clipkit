@@ -3,5 +3,11 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <body>{children}</body>;
+  return (
+    <body className="mx-auto my-0 w-full max-w-lg p-8">
+      <main className="w-full rounded-lg border-black/10 bg-zinc-900 p-6 dark:border-white/10">
+        {children}
+      </main>
+    </body>
+  );
 }
