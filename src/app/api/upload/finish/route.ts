@@ -5,7 +5,7 @@ import { ClipsService } from "~/data/clips";
 import { S3Service } from "~/data/s3";
 
 export async function POST(request: Request) {
-  const user = await AuthService.requireUser(false);
+  const user = await AuthService.getUser();
   if (!user) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }

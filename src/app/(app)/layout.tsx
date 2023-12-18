@@ -7,7 +7,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await AuthService.requireUser(false);
+  const user = await AuthService.getUser();
 
   return (
     <body className={`mx-auto my-0 w-full max-w-4xl`}>

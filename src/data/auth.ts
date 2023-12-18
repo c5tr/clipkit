@@ -69,10 +69,10 @@ export class AuthService {
   /**
    * This method can only be called within a Next.js request context.
    */
-  static requireUser = cache(async (redirectToLogin: boolean = true) => {
+  static getUser = cache(async () => {
     const accessToken = cookies().get("accessToken");
     if (!accessToken) {
-      throw redirect("/login");
+      return;
     }
 
     try {
@@ -88,8 +88,9 @@ export class AuthService {
         },
       });
 
-      if (!user || new Date(data.iat * 1000) < user.tokensValidAfter)
-        throw redirect("/login");
+      if (!user || new Date(data.iat * 1000) < user.tokensValidAfter) {
+        return;
+      }
 
       return data;
     } catch (e) {
@@ -97,9 +98,15 @@ export class AuthService {
         e instanceof jwt.TokenExpiredError ||
         e instanceof jwt.JsonWebTokenError
       ) {
-        if (redirectToLogin) throw redirect("/login");
+        return;
       }
       throw e;
     }
-  })
+  });
+
+  static requireUser = cache(async (): Promise<JwtPayload> => {
+    const user = await this.getUser();
+    if (!user) throw redirect('/login');
+    return user;
+  });
 }
