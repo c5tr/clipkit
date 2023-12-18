@@ -10,10 +10,10 @@ const cachedGetClipById = cache(
 const mimeTypes: {
   [key: string]: string;
 } = {
-  'mp4': 'video/mp4',
-  'mov': 'video/quicktime',
-  'webm': 'video/webm'
-}
+  mp4: "video/mp4",
+  mov: "video/quicktime",
+  webm: "video/webm",
+};
 
 export async function generateMetadata({
   params,
@@ -25,16 +25,12 @@ export async function generateMetadata({
 
   return {
     title: clip.title,
-    openGraph: {
-      videos: {
-        url: `${process.env.S3_PUBLIC_URL}/${params.slug}.${clip.videoFormat}`,
-        type: mimeTypes[clip.videoFormat],
-      },
-      images: {
-        url: `${process.env.S3_PUBLIC_URL}/${params.slug}.webp`,
-      },
-      type: 'video.other'
-    }
+    other: {
+      "og:video": `${process.env.S3_PUBLIC_URL}/${params.slug}.${clip.videoFormat}`,
+      "og:video:type": mimeTypes[clip.videoFormat],
+      "og:type": "video",
+      "og:image": `${process.env.S3_PUBLIC_URL}/${params.slug}.webp`
+    },
   };
 }
 
