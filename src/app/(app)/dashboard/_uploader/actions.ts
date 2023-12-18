@@ -14,7 +14,7 @@ export async function createUpload(filename: string) {
 
 export async function finishUpload(id: string) {
   const user = await AuthService.requireUser();
-  const clip = await ClipsService.getClipById(user.id, id);
+  const clip = await ClipsService.getClipById(id, user.id);
   if (!clip)
     return {
       error: "Unauthorized",

@@ -47,13 +47,19 @@ export class ClipsService {
         id: true,
         title: true,
       },
-      orderBy: desc(clips.createdAt)
+      orderBy: desc(clips.createdAt),
     });
   }
 
-  static async getClipById(user: number, id: string) {
+  /**
+   * @param id Clip ID
+   * @param user User ID. Include to only return clip if it's owned by the specified user
+   */
+  static async getClipById(id: string, user: number | undefined = undefined) {
     return await db.query.clips.findFirst({
-      where: and(eq(clips.id, id), eq(clips.userId, user)),
+      where: !user
+        ? eq(clips.id, id)
+        : and(eq(clips.id, id), eq(clips.userId, user)),
       columns: {
         userId: false,
         id: false,
