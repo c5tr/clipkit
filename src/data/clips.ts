@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "./db";
 import { clips } from "./db/schema";
 import { S3Service } from "./s3";
@@ -38,5 +38,25 @@ export class ClipsService {
         status: "available",
       })
       .where(eq(clips.id, id));
+  }
+
+  static async getAllByUser(id: number) {
+    return await db.query.clips.findMany({
+      where: and(eq(clips.userId, id), eq(clips.status, "available")),
+      columns: {
+        id: true,
+        title: true,
+      },
+    });
+  }
+
+  static async getClipById(user: number, id: string) {
+    return await db.query.clips.findFirst({
+      where: and(eq(clips.id, id), eq(clips.userId, user)),
+      columns: {
+        userId: false,
+        id: false,
+      },
+    });
   }
 }
