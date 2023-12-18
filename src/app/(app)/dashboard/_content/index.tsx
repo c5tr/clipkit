@@ -2,9 +2,8 @@
 
 /* eslint-disable @next/next/no-img-element */
 import { useState } from "react";
-import { Clip, getClips } from "../actions";
+import { Clip, deleteClip, getClips } from "../actions";
 import Link from "next/link";
-import DeleteButton from "../_delete-button/delete-button";
 import { Uploader } from "../_uploader";
 
 export default function ClientSideDashboard({
@@ -42,7 +41,16 @@ export default function ClientSideDashboard({
               >
                 <div className="i-bi-play" />
               </Link>
-              <DeleteButton id={clip.id} />
+              <button
+                type="button"
+                onClick={async () => {
+                  await deleteClip(clip.id);
+                  reload();
+                }}
+                className="flex justify-center hover:bg-zinc-100 dark:hover:bg-zinc-900"
+              >
+                <div className="i-bi-trash3" />
+              </button>
             </div>
           </div>
         ))}
