@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
   const data = await request.json();
-  const id = data['id'] as string | undefined;
+  const id = data["id"] as string | undefined;
   if (!id)
     return Response.json(
       {
@@ -20,9 +20,12 @@ export async function POST(request: Request) {
     );
   const clip = await ClipsService.getClipById(id, user.id);
   if (!clip)
-    return {
-      error: "Unauthorized",
-    };
+    return Response.json(
+      {
+        error: "Unauthorized",
+      },
+      { status: 401 },
+    );
   execFileSync(process.env.FFMPEG_PATH!, [
     "-i",
     `${process.env.S3_PUBLIC_URL}/${id}.${clip.videoFormat}`,
