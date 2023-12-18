@@ -2,7 +2,7 @@
 const nextConfig = {
   experimental: {
     outputFileTracingIncludes: {
-      "/api/upload/finish": ["./bin"],
+      "/api/upload/finish": ["./bin/**/*"],
     },
   },
 };
