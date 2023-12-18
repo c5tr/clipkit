@@ -34,6 +34,11 @@ export const clips = sqliteTable(
     title: text("title").notNull(),
     status: text("status").default("uploading").notNull(),
     videoFormat: text("video_format").notNull(),
+    createdAt: integer("created_at", {
+      mode: "timestamp",
+    })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
   },
   (table) => ({
     userIdIdx: index("user_id_idx").on(table.userId),

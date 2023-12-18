@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "./db";
 import { clips } from "./db/schema";
 import { S3Service } from "./s3";
@@ -47,6 +47,7 @@ export class ClipsService {
         id: true,
         title: true,
       },
+      orderBy: desc(clips.createdAt)
     });
   }
 
