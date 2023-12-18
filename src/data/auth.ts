@@ -5,6 +5,7 @@ import { users } from "./db/schema";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 type JwtPayload = {
   id: number;
@@ -68,7 +69,7 @@ export class AuthService {
   /**
    * This method can only be called within a Next.js request context.
    */
-  static async requireUser(redirectToLogin: boolean = true) {
+  static requireUser = cache(async (redirectToLogin: boolean = true) => {
     const accessToken = cookies().get("accessToken");
     if (!accessToken) {
       throw redirect("/login");
@@ -100,5 +101,5 @@ export class AuthService {
       }
       throw e;
     }
-  }
+  })
 }
