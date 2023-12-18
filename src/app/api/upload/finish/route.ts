@@ -31,10 +31,10 @@ export async function POST(request: Request) {
     `${process.env.S3_PUBLIC_URL}/${id}.${clip.videoFormat}`,
     "-vframes",
     "1",
-    `${id}.webp`,
+    `/tmp/${id}.webp`,
   ]);
-  await S3Service.uploadLocalFile(`${id}.webp`);
+  await S3Service.uploadLocalFile(`${id}.webp`, `/tmp/${id}.webp`);
   await ClipsService.markAsAvailable(id);
-  await unlink(`${id}.webp`);
+  await unlink(`/tmp/${id}.webp`);
   return new Response(undefined);
 }

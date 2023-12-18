@@ -55,11 +55,11 @@ export class S3Service {
     await this.client.send(command);
   }
 
-  static async uploadLocalFile(path: string) {
+  static async uploadLocalFile(filename: string, path: string) {
     const fileContent = await readFile(path);
     const command = new PutObjectCommand({
       Bucket: this.bucket,
-      Key: path,
+      Key: filename,
       Body: fileContent,
     });
     await this.client.send(command);
