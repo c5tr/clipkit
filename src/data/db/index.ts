@@ -7,4 +7,13 @@ const client = createClient({
   authToken: process.env.DATABASE_AUTH_TOKEN,
 });
 
-export const db = drizzle(client, { schema });
+export const db = drizzle(client, {
+  schema,
+  logger: {
+    logQuery(query, params) {
+      if (process.env.NODE_ENV !== "production") {
+        console.log("Query: ", query, params);
+      }
+    },
+  },
+});
