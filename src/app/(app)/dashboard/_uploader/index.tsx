@@ -1,11 +1,9 @@
-"use client";
-
 import { useRef, useState } from "react";
 import { Button } from "~/components/button";
 import { Spinner } from "~/components/spinner";
-import { createUpload, finishUpload } from "./actions";
+import { createUpload } from "./actions";
 
-export function Uploader() {
+export function Uploader({ reload }: { reload: () => void }) {
   const [uploadsInProgress, setUploadsInProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -13,18 +11,29 @@ export function Uploader() {
     if (fileInputRef.current!.files!.length == 0) return;
     setUploadsInProgress((v) => v + fileInputRef.current!.files!.length);
     for (let i = 0; i < fileInputRef.current!.files!.length; i++) {
-      const uploadInfo = await createUpload(fileInputRef.current!.files![i].name);
+      const uploadInfo = await createUpload(
+        fileInputRef.current!.files![i].name,
+      );
       console.log(uploadInfo);
       const uploadReq = await fetch(uploadInfo.uploadUrl, {
-        method: 'PUT',
-        body: fileInputRef.current!.files![i]
+        method: "PUT",
+        body: fileInputRef.current!.files![i],
       });
       if (uploadReq.ok) {
         // finish upload
-        await finishUpload(uploadInfo.id);
+        const uploadFinishReq = await fetch("/api/upload/finish", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: uploadInfo.id,
+          }),
+        });
+        if (uploadFinishReq.ok) reload();
       }
       // show errors
-      setUploadsInProgress(v => v - 1);
+      setUploadsInProgress((v) => v - 1);
     }
   }
 
