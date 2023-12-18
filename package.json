@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "ffmpeg:install": "./scripts/install-ffmpeg.sh"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.474.0",
