@@ -66,4 +66,8 @@ export class ClipsService {
       },
     });
   }
+
+  static async deleteClip(id: string) {
+    await db.delete(clips).where(eq(clips.id, id));
+  }
 }

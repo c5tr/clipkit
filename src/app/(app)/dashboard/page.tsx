@@ -4,6 +4,8 @@ import { Uploader } from "./_uploader";
 import { ClipsService } from "~/data/clips";
 import { Spinner } from "~/components/spinner";
 import Link from "next/link";
+import { deleteClip } from "./_delete-button/actions";
+import DeleteButton from "./_delete-button/delete-button";
 
 export default async function Home() {
   const user = await AuthService.requireUser();
@@ -30,12 +32,7 @@ export default async function Home() {
               >
                 <div className="i-bi-play" />
               </Link>
-              <button
-                type="button"
-                className="flex justify-center hover:bg-zinc-100 dark:hover:bg-zinc-900"
-              >
-                <div className="i-bi-trash3" />
-              </button>
+              <DeleteButton id={clip.id} />
             </div>
           </div>
         ))}
