@@ -1,9 +1,13 @@
+"use client";
+
 import { useRef, useState } from "react";
 import { Button } from "~/components/button";
 import { Spinner } from "~/components/spinner";
 import { createUpload } from "./actions";
+import { useRouter } from "next/navigation";
 
-export function Uploader({ reload }: { reload: () => void }) {
+export function Uploader() {
+  const router = useRouter();
   const [uploadsInProgress, setUploadsInProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -30,7 +34,7 @@ export function Uploader({ reload }: { reload: () => void }) {
             id: uploadInfo.id,
           }),
         });
-        if (uploadFinishReq.ok) reload();
+        if (uploadFinishReq.ok) router.refresh();
       }
       // show errors
       setUploadsInProgress((v) => v - 1);
