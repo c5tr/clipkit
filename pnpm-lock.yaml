@@ -14,6 +14,9 @@ dependencies:
   '@egoist/tailwindcss-icons':
     specifier: ^1.6.0
     version: 1.6.0(tailwindcss@3.3.6)
+  '@fontsource-variable/manrope':
+    specifier: ^5.0.18
+    version: 5.0.18
   '@iconify-json/bi':
     specifier: ^1.1.22
     version: 1.1.22
@@ -1458,6 +1461,10 @@ packages:
     resolution: {integrity: sha512-+KpH+QxZU7O4675t3mnkQKcZZg56u+K/Ct2K+N2AZYNVK8kyeo/bI18tI8aPm3tvNNRyTWfj6s5tnGNlcbQRsA==}
     engines: {node: '>=14'}
     dev: true
+
+  /@fontsource-variable/manrope@5.0.18:
+    resolution: {integrity: sha512-BmTWanceVCX3/xAY0VhBLM9fwEwe+Z/jR3/EPDLxas6+b3gnBChI+MYh+vMxDPEavfpEhcQptCCNJ3kQxn07iw==}
+    dev: false
 
   /@humanwhocodes/config-array@0.11.13:
     resolution: {integrity: sha512-JSBDMiDKSzQVngfRjOdFXgFfklaXI4K9nLF49Auh21lmBWRLIK3+xTErTWD4KU54pb6coM6ESE7Awz/FNU3zgQ==}
