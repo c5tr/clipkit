@@ -26,7 +26,7 @@ export default async function Home() {
             <h2 className="my-2 line-clamp-1 overflow-ellipsis font-bold">
               {clip.title}
             </h2>
-            <div className="flex w-full overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-800 [&>*]:flex-grow">
+            <div className="flex w-full overflow-hidden rounded-lg border border-black/20 dark:border-white/20 [&>*]:flex-grow">
               <Link
                 href={"/v/" + clip.id}
                 className="flex justify-center rounded-none border-r border-inherit py-[0.6rem] hover:bg-zinc-100 dark:hover:bg-zinc-900"
