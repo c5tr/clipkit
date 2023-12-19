@@ -52,15 +52,14 @@ export function Uploader() {
         onChange={onFilesSelected}
       />
       <Button
-        className={`w-full bg-zinc-100 dark:bg-zinc-900 ${
-          uploadsInProgress > 0 ? "hidden" : ""
-        }`}
+        variant="outlined"
+        className={`w-full ${uploadsInProgress > 0 ? "hidden" : ""}`}
         onClick={() => fileInputRef.current?.click()}
       >
         Upload
       </Button>
       {uploadsInProgress > 0 && (
-        <div className="flex items-center justify-center gap-4 rounded-lg bg-black/10 px-4 py-2 dark:bg-white/10">
+        <div className="flex items-center justify-center gap-4 rounded-lg  border border-zinc-300 bg-transparent px-4 py-2 text-black dark:border-0 dark:bg-zinc-900 dark:text-white">
           <Spinner />
           <span>
             Uploading {uploadsInProgress}{" "}

@@ -33,9 +33,14 @@ export function AuthForm({
       )}
       <input type="email" placeholder="Email" name="email" required />
       <input type="password" placeholder="Password" name="password" required />
-      <SubmitButton>{mode === "login" ? "Login" : "Register"}</SubmitButton>
+      <SubmitButton variant="filled">
+        {mode === "login" ? "Login" : "Register"}
+      </SubmitButton>
       {enableRegistrations && (
-        <a href={mode == "login" ? "/register" : "/login"} className="text-center mt-2">
+        <a
+          href={mode == "login" ? "/register" : "/login"}
+          className="mt-2 text-center"
+        >
           {mode == "login"
             ? "I don't have an account"
             : "I already have an account"}

@@ -1,15 +1,9 @@
 "use client";
-import { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 import { useFormStatus } from "react-dom";
-import { Button } from "./button";
+import { Button, ButtonProps } from "./button";
 import { cn } from "~/utils/cn";
 
-export function SubmitButton(
-  props: DetailedHTMLProps<
-    ButtonHTMLAttributes<HTMLButtonElement>,
-    HTMLButtonElement
-  >,
-) {
+export function SubmitButton(props: ButtonProps) {
   const { pending } = useFormStatus();
 
   return (
