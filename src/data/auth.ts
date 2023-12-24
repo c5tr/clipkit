@@ -1,22 +1,21 @@
 import * as bcrypt from "bcryptjs";
-import * as jwt from "jsonwebtoken";
 import { db } from "./db";
 import { users } from "./db/schema";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
+import * as jose from "jose";
 
-type JwtPayload = {
+type AuthData = {
   id: number;
-  iat: number;
-};
-
-type JwtTokens = {
-  accessToken: string;
 };
 
 export class AuthService {
+  private static secret = new TextEncoder().encode(
+    process.env.JWT_ACCESS_SECRET!,
+  );
+
   /**
    * @returns ID of newly created account
    */
@@ -47,66 +46,63 @@ export class AuthService {
       },
     });
     if (!user || !bcrypt.compareSync(password, user.password)) return false;
-    this.createToken(user.id);
+    await this.createToken(user.id);
     return true;
   }
 
   /**
    * This method can only be called within a Next.js request context.
    */
-  static createToken(id: number) {
-    cookies().set(
-      "accessToken",
-      jwt.sign({ id }, process.env.JWT_ACCESS_SECRET!),
-      {
-        secure: true,
-        sameSite: "strict",
-        httpOnly: true,
-      },
-    );
+  static async createToken(id: number) {
+    const token = await new jose.SignJWT({ id })
+      .setProtectedHeader({ alg: "HS256", typ: "JWT" })
+      .sign(this.secret);
+    cookies().set("accessToken", token, {
+      secure: true,
+      sameSite: "strict",
+      httpOnly: true,
+    });
   }
 
   /**
    * This method can only be called within a Next.js request context.
    */
-  static getUser = cache(async () => {
+  static getUser = cache(async (): Promise<AuthData | undefined> => {
     const accessToken = cookies().get("accessToken");
     if (!accessToken) {
       return;
     }
 
     try {
-      const data = jwt.verify(
+      const { payload: data } = await jose.jwtVerify(
         accessToken.value,
-        process.env.JWT_ACCESS_SECRET!,
-      ) as JwtPayload;
+        this.secret,
+      );
+      const userId = data["id"] as number;
 
       const user = await db.query.users.findFirst({
-        where: eq(users.id, data.id),
+        where: eq(users.id, userId),
         columns: {
           tokensValidAfter: true,
         },
       });
 
-      if (!user || new Date(data.iat * 1000) < user.tokensValidAfter) {
+      if (!user || new Date(data["iat"]! * 1000) < user.tokensValidAfter) {
         return;
       }
 
-      return data;
+      return { id: userId };
     } catch (e) {
-      if (
-        e instanceof jwt.TokenExpiredError ||
-        e instanceof jwt.JsonWebTokenError
-      ) {
+      if (e instanceof jose.errors.JWSSignatureVerificationFailed) {
         return;
       }
       throw e;
     }
   });
 
-  static requireUser = cache(async (): Promise<JwtPayload> => {
+  static requireUser = cache(async (): Promise<AuthData> => {
     const user = await this.getUser();
-    if (!user) throw redirect('/login');
+    if (!user) throw redirect("/login");
     return user;
   });
 }
