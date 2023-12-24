@@ -7,6 +7,8 @@ import { AuthForm } from "../form";
 export default function Register() {
   async function action(_: any, formData: FormData) {
     "use server";
+    if (process.env.ENABLE_REGISTRATIONS !== "true") throw redirect('/login');
+
     try {
       const { email, password } = accountSchema.parse(formData);
       const id = await AuthService.createAccount(email, password);
@@ -25,11 +27,16 @@ export default function Register() {
     }
     redirect("/dashboard");
   }
+
+  if (process.env.ENABLE_REGISTRATIONS !== "true") {
+    throw redirect('/login');
+  }
+
   return (
     <AuthForm
       action={action}
       mode="register"
-      enableRegistrations={process.env.ENABLE_REGISTRATIONS === "true"}
+      enableRegistrations={true}
     />
   );
 }
