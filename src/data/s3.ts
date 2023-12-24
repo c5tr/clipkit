@@ -5,7 +5,6 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { readFile } from "fs/promises";
 
 export class S3Service {
   private static client = new S3Client({
@@ -51,16 +50,6 @@ export class S3Service {
       Delete: {
         Objects: objects.map((object) => ({ Key: object })),
       },
-    });
-    await this.client.send(command);
-  }
-
-  static async uploadLocalFile(filename: string, path: string) {
-    const fileContent = await readFile(path);
-    const command = new PutObjectCommand({
-      Bucket: this.bucket,
-      Key: filename,
-      Body: fileContent,
     });
     await this.client.send(command);
   }

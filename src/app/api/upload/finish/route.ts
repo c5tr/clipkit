@@ -1,8 +1,11 @@
 import { execFileSync } from "child_process";
+import { readFileSync } from "fs";
 import { unlink } from "fs/promises";
 import { AuthService } from "~/data/auth";
 import { ClipsService } from "~/data/clips";
 import { S3Service } from "~/data/s3";
+
+export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   const user = await AuthService.getUser();
@@ -33,7 +36,12 @@ export async function POST(request: Request) {
     "1",
     `/tmp/${id}.webp`,
   ]);
-  await S3Service.uploadLocalFile(`${id}.webp`, `/tmp/${id}.webp`);
+  const uploadUrl = await S3Service.createUploadUrl(`${id}.webp`);
+  const file = readFileSync(`/tmp/${id}.webp`);
+  await fetch(uploadUrl, {
+    method: 'PUT',
+    body: file
+  })
   await ClipsService.markAsAvailable(id);
   await unlink(`/tmp/${id}.webp`);
   return new Response(undefined);
