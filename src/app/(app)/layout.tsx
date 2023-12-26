@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { AuthService } from "~/data/auth";
+import { Menu } from "./menu";
 
 export default async function RootLayout({
   children,
@@ -17,7 +18,7 @@ export default async function RootLayout({
           <h1 className="text-xl font-bold">clipkit</h1>
         </Link>
         { /* Leaving it like this for now because in the future there will be a menu instead of the log out link */}
-        { user ? <Link href="/logout">Log out</Link> : <Link href="/login">Log in</Link>}
+        { user ? <Menu /> : <Link href="/login">Log in</Link>}
       </header>
       <div className="px-6 py-4">{children}</div>
     </body>
