@@ -105,4 +105,27 @@ export class AuthService {
     if (!user) throw redirect("/login");
     return user;
   });
+
+  static async updatePassword(
+    userId: number,
+    oldPassword: string,
+    newPassword: string,
+  ) {
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: {
+        password: true,
+      },
+    });
+
+    if (!user) return false;
+
+    if (!bcrypt.compareSync(oldPassword, user.password)) return false;
+
+    await db
+      .update(users)
+      .set({ password: bcrypt.hashSync(newPassword) })
+      .where(eq(users.id, userId));
+    return true;
+  }
 }
