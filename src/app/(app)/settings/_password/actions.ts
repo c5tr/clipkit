@@ -2,7 +2,8 @@
 
 import { ZodError, z } from "zod";
 import { zfd } from "zod-form-data";
-import { AuthService } from "~/data/auth";
+import { updateAccountPassword } from "~/data/accounts";
+import { requireUser } from "~/data/auth";
 
 const UpdatePasswordSchema = zfd.formData({
   oldPassword: z.string().min(8, "Old password has to contain at least 8 characters."),
@@ -28,7 +29,7 @@ export async function updatePassword(
   previousState: any,
   formData: FormData,
 ): Promise<UpdatePasswordResponse> {
-  const user = await AuthService.requireUser();
+  const user = await requireUser();
   try {
     const data = UpdatePasswordSchema.parse(formData);
 
@@ -49,9 +50,8 @@ export async function updatePassword(
     }
 
     if (
-      !(await AuthService.updatePassword(
+      !(await updateAccountPassword(
         user.id,
-        data.oldPassword,
         data.newPassword,
       ))
     ) {

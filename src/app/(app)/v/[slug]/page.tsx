@@ -1,10 +1,10 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
-import { ClipsService } from "~/data/clips";
+import { getClipById } from "~/data/clips";
 
 const cachedGetClipById = cache(
-  async (id: string) => await ClipsService.getClipById(id),
+  async (id: string) => await getClipById(id),
 );
 
 const mimeTypes: {

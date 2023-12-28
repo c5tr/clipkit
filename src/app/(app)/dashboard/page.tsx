@@ -1,13 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
-import { AuthService } from "~/data/auth";
-import { Uploader } from "./_uploader";
 import Link from "next/link";
 import { DeleteButton } from "./delete-button";
-import { ClipsService } from "~/data/clips";
+import { getAllClipsByUser } from "~/data/clips";
+import { requireUser } from "~/data/auth";
+import { Uploader } from "./_uploader";
 
 export default async function Home() {
-  const user = await AuthService.requireUser();
-  const clips = (await ClipsService.getAllByUser(user.id)).map((clip) => ({
+  const user = await requireUser();
+  const clips = (await getAllClipsByUser(user.id)).map((clip) => ({
     ...clip,
     thumbnailUrl: `${process.env.S3_PUBLIC_URL}/${clip.id}.webp`,
   }));

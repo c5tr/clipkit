@@ -1,8 +1,8 @@
-import { AuthService } from "~/data/auth";
+import { requireUser } from "~/data/auth";
 import { UpdatePassword } from "./_password";
 
 export default async function Settings() {
-  const user = await AuthService.requireUser();
+  const user = await requireUser();
 
   return (
     <>

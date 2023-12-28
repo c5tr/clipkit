@@ -1,14 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { AuthService } from "~/data/auth";
 import { Menu } from "./menu";
+import { getUser } from "~/data/auth";
 
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await AuthService.getUser();
+  const user = await getUser();
 
   return (
     <body className={`mx-auto my-0 w-full max-w-4xl`}>

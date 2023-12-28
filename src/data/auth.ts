@@ -11,121 +11,86 @@ type AuthData = {
   id: number;
 };
 
-export class AuthService {
-  private static secret = new TextEncoder().encode(
-    process.env.JWT_ACCESS_SECRET!,
-  );
+// JWT secret for usage with jose (the library used to handle JWTs)
+const secret = new TextEncoder().encode(process.env.JWT_ACCESS_SECRET!);
 
-  /**
-   * @returns ID of newly created account
-   */
-  static async createAccount(
-    email: string,
-    password: string,
-  ): Promise<number | undefined> {
-    const [newAccount] = await db
-      .insert(users)
-      .values({
-        email,
-        password: bcrypt.hashSync(password),
-      })
-      .returning({
-        id: users.id,
-      });
-    if (!newAccount) return undefined;
-    return newAccount.id;
-  }
-
-  static async login(email: string, password: string): Promise<boolean> {
-    const user = await db.query.users.findFirst({
-      where: eq(users.email, email),
-      columns: {
-        id: true,
-        password: true,
-        tokensValidAfter: true,
-      },
-    });
-    if (!user || !bcrypt.compareSync(password, user.password)) return false;
-    await this.createToken(user.id);
-    return true;
-  }
-
-  /**
-   * This method can only be called within a Next.js request context.
-   */
-  static async createToken(id: number) {
-    const token = await new jose.SignJWT({ id })
-      .setProtectedHeader({ alg: "HS256", typ: "JWT" })
-      .sign(this.secret);
-    cookies().set("accessToken", token, {
-      secure: true,
-      sameSite: "strict",
-      httpOnly: true,
-    });
-  }
-
-  /**
-   * This method can only be called within a Next.js request context.
-   */
-  static getUser = cache(async (): Promise<AuthData | undefined> => {
-    const accessToken = cookies().get("accessToken");
-    if (!accessToken) {
-      return;
-    }
-
-    try {
-      const { payload: data } = await jose.jwtVerify(
-        accessToken.value,
-        this.secret,
-      );
-      const userId = data["id"] as number;
-
-      const user = await db.query.users.findFirst({
-        where: eq(users.id, userId),
-        columns: {
-          tokensValidAfter: true,
-        },
-      });
-
-      if (!user || new Date(data["iat"]! * 1000) < user.tokensValidAfter) {
-        return;
-      }
-
-      return { id: userId };
-    } catch (e) {
-      if (e instanceof jose.errors.JWSSignatureVerificationFailed) {
-        return;
-      }
-      throw e;
-    }
+/**
+ * Log in a user
+ * @returns `true` if email and password were correct.
+ */
+export async function login(email: string, password: string): Promise<boolean> {
+  const user = await db.query.users.findFirst({
+    where: eq(users.email, email),
+    columns: {
+      id: true,
+      password: true,
+      tokensValidAfter: true,
+    },
   });
+  if (!user || !bcrypt.compareSync(password, user.password)) return false;
+  await createToken(user.id);
+  return true;
+}
 
-  static requireUser = cache(async (): Promise<AuthData> => {
-    const user = await this.getUser();
-    if (!user) throw redirect("/login");
-    return user;
+/**
+ * Creates a JWT and adds it to a cookie called `accessToken`
+ *
+ * This method can only be called within a Next.js request context.
+ */
+export async function createToken(id: number) {
+  const token = await new jose.SignJWT({ id })
+    .setProtectedHeader({ alg: "HS256", typ: "JWT" })
+    .sign(secret);
+  cookies().set("accessToken", token, {
+    secure: true,
+    sameSite: "strict",
+    httpOnly: true,
   });
+}
 
-  static async updatePassword(
-    userId: number,
-    oldPassword: string,
-    newPassword: string,
-  ) {
+/**
+ * Get the current logged in user.
+ *
+ * This method can only be called within a Next.js request context.
+ */
+export const getUser = cache(async (): Promise<AuthData | undefined> => {
+  const accessToken = cookies().get("accessToken");
+  if (!accessToken) {
+    return;
+  }
+
+  try {
+    const { payload: data } = await jose.jwtVerify(accessToken.value, secret);
+    const userId = data["id"] as number;
+
     const user = await db.query.users.findFirst({
       where: eq(users.id, userId),
       columns: {
-        password: true,
+        tokensValidAfter: true,
       },
     });
 
-    if (!user) return false;
+    if (!user || new Date(data["iat"]! * 1000) < user.tokensValidAfter) {
+      return;
+    }
 
-    if (!bcrypt.compareSync(oldPassword, user.password)) return false;
-
-    await db
-      .update(users)
-      .set({ password: bcrypt.hashSync(newPassword) })
-      .where(eq(users.id, userId));
-    return true;
+    return { id: userId };
+  } catch (e) {
+    if (e instanceof jose.errors.JWSSignatureVerificationFailed) {
+      return;
+    }
+    throw e;
   }
-}
+});
+
+/**
+ * Gets the currently logged in user. If user is not logged in, automatically redirects to
+ * the login page.
+ *
+ * This method can only be called within a Next.js request context.
+ */
+export const requireUser = cache(async (): Promise<AuthData> => {
+  const user = await getUser();
+  if (!user) throw redirect("/login");
+  return user;
+});

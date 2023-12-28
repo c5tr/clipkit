@@ -18,7 +18,6 @@ export function Uploader() {
       const uploadInfo = await createUpload(
         fileInputRef.current!.files![i].name,
       );
-      console.log(uploadInfo);
       const uploadReq = await fetch(uploadInfo.uploadUrl, {
         method: "PUT",
         body: fileInputRef.current!.files![i],

@@ -1,15 +1,15 @@
 import { ZodError } from "zod";
 import { AuthForm } from "../form";
 import { accountSchema } from "../schema";
-import { AuthService } from "~/data/auth";
 import { redirect } from "next/navigation";
+import { login } from "~/data/auth";
 
 export default function Login() {
   async function action(_: any, formData: FormData) {
     "use server";
     try {
       const { email, password } = accountSchema.parse(formData);
-      if (!(await AuthService.login(email, password))) {
+      if (!(await login(email, password))) {
         return { message: "Invalid email or password." };
       }
     } catch (e) {
